@@ -5,14 +5,14 @@ import { useGlobalContext } from "../contexts/GlobalContext"
 function NavBar() {
 
     const [searchValue, setSearchValue] = useState("")
-    const { setMoviesArr, moviesArr } = useGlobalContext()
+    const { setMoviesArr } = useGlobalContext()
 
     const onChange = (event) => {
         setSearchValue(event.target.value)
     }
 
     const handleSubmit = async (event) => {
-        // try {
+        try {
             event.preventDefault()
             const [movies, tv] = await Promise.all([
                 axios
@@ -22,13 +22,8 @@ function NavBar() {
                                 api_key: "9d5235dee5556b95d050a5c00ecfc6fc",
                                 query: searchValue
                             }
-                        })
-                    .then((resp) => {
-                        console.log(resp);
-        
-                        setMoviesArr(resp.data.results)
-                    }),
-        
+                        }),
+
                 axios
                     .get("https://api.themoviedb.org/3/search/tv",
                         {
@@ -37,16 +32,17 @@ function NavBar() {
                                 query: searchValue
                             }
                         }
-                    )
-                    .then((resp) =>{
-                        setMoviesArr(...moviesArr, resp.data.results)
-                    })
-                ])
-                // } 
-            // )
-        } 
-            
+                    ),
+
+            ])
+        } finally {
+            console.log("Tutto bene");
+        }
         
+        setMoviesArr(...movies.data.results, ...tv.data.results)
+    }
+
+
     return (
 
         <header>
